@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MVC">
+      <UniqueIdentifier>{c1f4f728-1c46-4fe6-9062-8e207c72634b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PanoStitch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PanoScriptTransform.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PanoSeamFinder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PanoScript.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FeatherStitch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CmFile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MVCStitch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MVC\MVCoordinate.cpp">
+      <Filter>MVC</Filter>
+    </ClCompile>
+    <ClCompile Include="MVC\MVCTriangulate.cpp">
+      <Filter>MVC</Filter>
+    </ClCompile>
+    <ClCompile Include="MVC\Vector3f.cpp">
+      <Filter>MVC</Filter>
+    </ClCompile>
+    <ClCompile Include="MVC\MVCBlender.cpp">
+      <Filter>MVC</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PanoScript.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PanoStitch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PanoSeamFinder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CmFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PanoScriptTransform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FeatherStitch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MVCStitch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MVC\MVCoordinate.h">
+      <Filter>MVC</Filter>
+    </ClInclude>
+    <ClInclude Include="MVC\MVCTriangulate.h">
+      <Filter>MVC</Filter>
+    </ClInclude>
+    <ClInclude Include="MVC\Vector3f.h">
+      <Filter>MVC</Filter>
+    </ClInclude>
+    <ClInclude Include="MVC\MVCBlender.h">
+      <Filter>MVC</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
