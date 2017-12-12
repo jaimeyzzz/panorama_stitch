@@ -1,7 +1,14 @@
-#include "PanoScriptTransform.h"
+#include "pano_transform.h"
+
 #include <float.h>
-#include <cmath>
 #include <cassert>
+#include <cmath>
+#include <cstdio>
+#include <stdarg.h>
+#include <cstring>
+#include <cstdlib>
+#include <ctype.h>
+#include <limits.h>
 
 #define R_EPS  1.0e-6   
 #define MAXITER 100
@@ -18,9 +25,9 @@
 void    matrix_matrix_mult(double m1[3][3], double m2[3][3], double result[3][3]);
 int     polzeros_();
 
-void cubeZero(double *a, int *n, double *root);
-void squareZero(double *a, int *n, double *root);
-double cubeRoot(double x);
+void CubeZero(double *a, int *n, double *root);
+void SquareZero(double *a, int *n, double *root);
+double CubeRoot(double x);
 
 
 //------------------------- Some auxilliary math functions --------------------------------------------
@@ -101,7 +108,7 @@ void SetMatrix(double a, double b, double c, double m[3][3], int cl)
 #define         var1            ((double*)params)[1]
 #define         var2            ((double*)params)[2]
 #define         var3            ((double*)params)[3]
-#define         mp              ((struct MakeParams*)params)
+#define         mp              ((struct TransParams*)params)
 
 // Rotate equirectangular image
 
@@ -187,8 +194,6 @@ int inv_vertical(double x_dest, double y_dest, double* x_src, double* y_src, voi
 	return 1;
 }
 
-
-
 int resize(double x_dest, double y_dest, double* x_src, double* y_src, void* params)
 {
 	// params: double scale_horizontal, double scale_vertical;
@@ -197,175 +202,6 @@ int resize(double x_dest, double y_dest, double* x_src, double* y_src, void* par
 	*y_src = y_dest * var1;
 	return 1;
 }
-
-//int tiltInverse(double x_dest, double y_dest, double* x_src, double* y_src, void* params)
-//{
-//
-//	// 
-//	// This is really the inverse transformation
-//
-//	//	printf( "Entered invtilt function \n");
-//
-//
-//	double theta = mp->tilt[0];            // use the tilt angle specified by the 'L' parameter
-//	double sigma = mp->tilt[1];            // use the tilt angle specified by the 'L' parameter
-//	double phi = mp->tilt[2];
-//	double scale = mp->tilt[3];
-//	double v[3];                                            // 3D projective coordinate vector
-//	double m_tilt[3][3];                            // tilt matrix
-//	double m_rotate[3][3];                            // tilt matrix
-//	double xmax = mp->im->width / 2;          // maximum y value is image width divided by 2
-//	double z0;
-//	double FOV = DEG_TO_RAD(mp->im->hfov / scale);
-//	double m_slant[3][3];                           // slant matrix
-//
-//	//        printf("Tilt Inverse %5.2f %5.2f %5.2f, %5.2f\n", x_dest, y_dest, theta, sigma);
-//
-//	// These operations are based on the typical projection of a point to a camera.
-//	// But, we want the projection to happen without translation, so we need to subtract
-//	// the coordinates of 0,0 projected... that is why the [1][2], [2][2] components
-//	// of the matrix are 0 or 1 in the tilt-x and tilt-y
-//
-//
-//	// Tilt (around X) INVERSE. The matrix does not require the [1][2], [2][2]
-//	// because it is tilted in its center
-//	m_tilt[0][0] = 1;       m_tilt[0][1] = 0;                               m_tilt[0][2] = 0;
-//	m_tilt[1][0] = 0;       m_tilt[1][1] = cos(theta);                      m_tilt[1][2] = 0; // sin(theta); 
-//	m_tilt[2][0] = 0;       m_tilt[2][1] = -sin(theta);                     m_tilt[2][2] = 1; //cos(theta);
-//
-//	// Tilt (around Y) INVERSE.       
-//	// [0][2] and [2][2] are changed to tilt on center of image. See above
-//	m_slant[0][0] = cos(sigma);	m_slant[0][1] = 0;		m_slant[0][2] = 0; //-sin(sigma);
-//	m_slant[1][0] = 0;		m_slant[1][1] = 1;		m_slant[1][2] = 0;
-//	m_slant[2][0] = sin(sigma);	m_slant[2][1] = 0;		m_slant[2][2] = 1; //cos(sigma);
-//
-//	// Slant (around z)
-//
-//	// Tilt (around z) INVERSE 
-//	m_rotate[0][0] = cos(phi);	m_rotate[0][1] = sin(phi);		m_rotate[0][2] = 0;
-//	m_rotate[1][0] = -sin(phi);	m_rotate[1][1] = cos(phi);		m_rotate[1][2] = 0;
-//	m_rotate[2][0] = 0;	        m_rotate[2][1] = 0;		        m_rotate[2][2] = 1;
-//
-//	z0 = xmax / tan(FOV / 2);           // FOV is full angle FOV in radians
-//	//    printf("Values Forward %5.2f %5.2f %5.2f, %5.2f\n", x_dest, y_dest, distanceparam, z0);
-//
-//	// z0 is distance to image from center of projection                                            
-//
-//	//printf("z0 is %f \n", z0);
-//	// Now you have [x_dest, y_dest, z1]'.  Multiply that vector by M, the adjusted tilt matrix
-//	v[0] = x_dest;
-//	v[1] = y_dest;
-//	v[2] = z0;
-//
-//	matrix_mult(m_rotate, v);
-//	matrix_mult(m_slant, v);
-//	matrix_mult(m_tilt, v);
-//
-//
-//	// Now project into xy plane
-//	*x_src = v[0] * z0 / v[2];
-//	*y_src = v[1] * z0 / v[2];
-//
-//	// THIS IS THE OPTIMIZED VERSION with no matrices multiplications. ..
-//#ifdef OPTIMIZED
-//	double x = x_dest;
-//	double y = y_dest;
-//	double above = (x * cos(phi) + y * sin(phi)) * cos(sigma);
-//	double below1 = (x * cos(phi) + y * sin(phi)) * sin(sigma);
-//	double below2 = -sin(theta) * (y * cos(phi) - x * sin(phi));
-//	double x4 = z0*  above / (below1 + below2 + z0);
-//
-//	above = (-x * sin(phi) + y * cos(phi)) * cos(theta);
-//	below1 = (x * cos(phi) + y * sin(phi)) * sin(sigma);
-//	below2 = (-x * sin(phi) + y * cos(phi)) * sin(theta);
-//
-//	double y4 = z0 * above / (below1 - below2 + z0);
-//#endif
-//
-//	//    printf("x4 %6.2f x_c %6.2f\n", x4, *x_src);
-//	//    printf("x4 %6.2f x_c %6.2f\n", y4, *y_src);
-//
-//
-//	return 1;
-//}
-//
-//// Dev: inverse tilt function.  Substitute correct matrix for "un-tilting"
-//int tiltForward(double x_dest, double y_dest, double* x_src, double* y_src, void* params)
-//{
-//	// INVERSE is a misnomer --panotools ##$&^
-//	// This is really the forward transformation
-//
-//	//	printf( "Entered invtilt function \n");
-//
-//	double phi = mp->tilt[0];		// use the tilt angle specified by the 'L' parameter (already in radians)
-//	double phi2 = mp->tilt[1];		// use the tilt angle specified by the 'L' parameter (already in radians)
-//	double phi3 = mp->tilt[2];
-//	double scale = mp->tilt[3];
-//
-//	double v[3];						// 3D projective coordinate vector
-//	double m_tilt[3][3];				// tilt matrix
-//	double xmax = mp->im->width / 2;		// maximum y value is image width divided by 2
-//	double z0, z1, s;
-//	double FOV = DEG_TO_RAD(mp->im->hfov / scale);
-//	double m_slant[3][3];                           // slant matrix
-//	double m_rotate[3][3];                          // tilt matrix
-//
-//	//        printf("Tilt Forward %5.2f %5.2f angles %5.2f, %5.2f, %5.2f\n", x_dest, y_dest, phi, phi2, phi3);
-//
-//	// TILT TO STRAIGHT matrix (tilt2() in MATLAB).  Really and UN-TILTING matrix
-//	// FORWARD
-//	m_tilt[0][0] = 1;	m_tilt[0][1] = 0;		m_tilt[0][2] = 0;
-//	m_tilt[1][0] = 0;	m_tilt[1][1] = 1 / cos(phi);	m_tilt[1][2] = 0;
-//	m_tilt[2][0] = 0;	m_tilt[2][1] = tan(phi);	m_tilt[2][2] = 1;
-//
-//
-//	m_slant[0][0] = 1 / cos(phi2);	m_slant[0][1] = 0;		m_slant[0][2] = 0;
-//	m_slant[1][0] = 0;		m_slant[1][1] = 1;		m_slant[1][2] = 0;
-//	m_slant[2][0] = -sin(phi2) / cos(phi2);	m_slant[2][1] = 0;		m_slant[2][2] = 1;
-//
-//	// FORWARD
-//	m_rotate[0][0] = cos(phi3);	m_rotate[0][1] = -sin(phi3);		m_rotate[0][2] = 0;
-//	m_rotate[1][0] = sin(phi3);	m_rotate[1][1] = cos(phi3);		m_rotate[1][2] = 0;
-//	m_rotate[2][0] = 0;	        m_rotate[2][1] = 0;		        m_rotate[2][2] = 1;
-//
-//
-//
-//	z0 = xmax / tan(FOV / 2); 		// FOV is full angle FOV in radians
-//	// z0 is distance to image from center of projection						
-//	// First step, undo the projection of the point
-//	z1 = (z0 * z0) / (x_dest * (-sin(phi2) / cos(phi2)) + y_dest * tan(phi) + z0);
-//
-//	s = z1 / z0;
-//	s = z0 / (x_dest * (-sin(phi2) / cos(phi2)) + y_dest * sin(phi) / cos(phi) + z0);
-//	z1 = (z0* z0) / (x_dest * (-sin(phi2) / cos(phi2)) + y_dest * sin(phi) / cos(phi) + z0);
-//
-//	//(y_dest * tan(phi) + x_dest * tan(phi2) + z0);
-//
-//	//s = z0 / (y_dest * tan(phi) + z0);		// s is a scaling factor ...
-//
-//	//printf("z0 is %f \n", z0);
-//	// Now you have [x_dest, y_dest, z1]'.  Multiply that vector by M, the adjusted tilt matrix
-//	v[0] = s* x_dest;
-//	v[1] = s* y_dest;
-//	v[2] = z1;
-//
-//	//	matrix_mult(m_tilt,v);
-//	matrix_mult(m_tilt, v);
-//	matrix_mult(m_slant, v);
-//	matrix_mult(m_rotate, v);
-//
-//	*x_src = v[0];			// convert back to cartesian coordinates
-//	*y_src = v[1];
-//
-//	//        printf( "Entered tiltforward function tilt z0,z1,v[21] (%f,%f, %f)\n", z0, z1, v[2]);
-//
-//	//	printf( "Entered invtiltb function in (%6.2f %6.2f) out (%6.2f %6.2f)\n", x_dest, y_dest, *x_src, *y_src);
-//
-//	// Uncommenting code below causes tilt function to do nothing:
-//	//		*x_src	= x_dest;	
-//	//		*y_src  = y_dest;
-//	return 1;
-//}
 
 int shear(double x_dest, double y_dest, double* x_src, double* y_src, void* params)
 {
@@ -1394,135 +1230,6 @@ int line_plane_intersection(double n[4],
 	return 1;
 }
 
-/** transfer a point from the master camera through a plane into camera
-*  at TrX, TrY, TrZ using the plane located at Te0 (yaw), Te1 (pitch)
-*/
-//int plane_transfer_to_camera(double x_dest, double y_dest, double * x_src, double * y_src, void * params)
-//{
-//	// params: distance, x1,y1,z1
-//
-//	double plane_coeff[4];
-//	double p1[3];
-//	double p2[3];
-//	double intersection[3];
-//
-//	// compute ray of sight for the current pixel in
-//	// the master panorama camera.
-//	// camera point
-//	p1[0] = p1[1] = p1[2] = 0;
-//	// point on sphere.
-//	cart_erect(x_dest, y_dest, &p2[0], mp->distance);
-//
-//	// compute plane description
-//	cart_erect(mp->trans[3], -mp->trans[4],
-//		&plane_coeff[0], 1.0);
-//
-//	// plane_coeff[0..2] is both the normal and a point
-//	// on the plane.
-//	plane_coeff[3] = -plane_coeff[0] * plane_coeff[0]
-//		- plane_coeff[1] * plane_coeff[1]
-//		- plane_coeff[2] * plane_coeff[2];
-//
-//	/*
-//	printf("Plane: y:%f p:%f coefficients: %f %f %f %f, ray direction: %f %f %f\n",
-//	mp->trans[3], mp->trans[4], plane_coeff[0], plane_coeff[1], plane_coeff[2], plane_coeff[3],
-//	p2[0],p2[1],p2[2]);
-//	*/
-//
-//	// perform intersection.
-//
-//	if (!line_plane_intersection(plane_coeff, p1, p2, &intersection[0])) {
-//		// printf("No intersection found, %f %f %f\n", p2[0], p2[1], p2[2]);
-//		return 0;
-//	}
-//
-//	// compute ray leading to the camera.
-//	intersection[0] -= mp->trans[0];
-//	intersection[1] -= mp->trans[1];
-//	intersection[2] -= mp->trans[2];
-//
-//	// transform into erect
-//	erect_cart(&intersection[0], x_src, y_src, mp->distance);
-//
-//	/*
-//	printf("pano->plane->cam(%.1f, %.1f, %.1f, y:%1f,p:%1f): %8.5f %8.5f -> %8.5f %8.5f %8.5f -> %8.5f %8.5f\n",
-//	mp->trans[0], mp->trans[1], mp->trans[2], mp->trans[3], mp->trans[4],
-//	x_dest, y_dest,
-//	intersection[0], intersection[1], intersection[2],
-//	*x_src, *y_src);
-//	*/
-//
-//	return 1;
-//}
-//
-//
-///** transfer a point from a camera centered at x1,y1,z1 into the camera at x2,y2,z2 */
-//int plane_transfer_from_camera(double x_dest, double y_dest, double * x_src, double * y_src, void * params)
-//{
-//
-//	double plane_coeff[4];
-//	double p1[3];
-//	double p2[3];
-//	double intersection[3];
-//
-//	// params: MakeParams
-//
-//	// compute ray of sight for the current pixel in
-//	// the master panorama camera.
-//	// camera point
-//	p1[0] = mp->trans[0];
-//	p1[1] = mp->trans[1];
-//	p1[2] = mp->trans[2];
-//
-//	// point on sphere (direction vector in camera coordinates)
-//	cart_erect(x_dest, y_dest, &p2[0], mp->distance);
-//	// add camera position to get point on ray
-//	p2[0] += p1[0];
-//	p2[1] += p1[1];
-//	p2[2] += p1[2];
-//
-//
-//	// compute plane description
-//	cart_erect(mp->trans[3], -mp->trans[4],
-//		&plane_coeff[0], 1.0);
-//
-//	// plane_coeff[0..2] is both the normal and a point
-//	// on the plane.
-//	plane_coeff[3] = -plane_coeff[0] * plane_coeff[0]
-//		- plane_coeff[1] * plane_coeff[1]
-//		- plane_coeff[2] * plane_coeff[2];
-//
-//	/*
-//	printf("Plane: y:%f p:%f coefficients: %f %f %f %f, ray direction: %f %f %f\n",
-//	mp->trans[3], mp->trans[4], plane_coeff[0], plane_coeff[1], plane_coeff[2], plane_coeff[3],
-//	p2[0],p2[1],p2[2]);
-//	*/
-//
-//
-//	// compute intersection
-//	if (!line_plane_intersection(plane_coeff, p1, p2, &intersection[0])) {
-//		//printf("No intersection found, %f %f %f\n", p2[0], p2[1], p2[2]);
-//		return 0;
-//	}
-//
-//	// the intersection vector is the vector of the ray of sight from
-//	// the master panorama camera.
-//
-//	// transform into erect
-//	erect_cart(&intersection[0], x_src, y_src, mp->distance);
-//
-//	/*
-//	printf("cam->plane->pano(%.1f, %.1f, %.1f, y:%1f,p:%1f): %8.5f %8.5f -> %8.5f %8.5f %8.5f -> %8.5f %8.5f\n",
-//	mp->trans[0], mp->trans[1], mp->trans[2], mp->trans[3], mp->trans[4],
-//	x_dest, y_dest,
-//	intersection[0], intersection[1], intersection[2],
-//	*x_src, *y_src);
-//
-//	*/
-//
-//	return 1;
-//}
-
 int erect_sphere_tp(double x_dest, double  y_dest, double* x_src, double* y_src, void* params)
 {
 	// params: double distanceparam
@@ -1763,94 +1470,10 @@ int shift_scale_rotate(double x_dest, double  y_dest, double* x_src, double* y_s
 	return 1;
 }
 
-//
-//// Correct radial luminance change using parabel
-//
-//unsigned char radlum(unsigned char srcPixel, int xc, int yc, void *params)
-//{
-//	// params: second and zero order polynomial coeff
-//	register double result;
-//
-//	result = (xc * xc + yc * yc) * ((double*)params)[0] + ((double*)params)[1];
-//	result = ((double)srcPixel) - result;
-//
-//	// JMW 2003/08/25  randomize a little
-//	result = result * ((1 + LUMINANCE_RANDOMIZE / 2) - LUMINANCE_RANDOMIZE * rand() / (double)RAND_MAX);
-//
-//	if (result < 0.0) return 0;
-//	if (result > 255.0) return 255;
-//
-//	return((unsigned char)(result + 0.5));
-//}
-//
-////Kekus 16 bit: 2003/Nov/18
-////Correct radial luminance change using parabel (16-bit supported)
-//unsigned short radlum16(unsigned short srcPixel, int xc, int yc, void *params)
-//{
-//	// params: second and zero order polynomial coeff
-//	register double result;
-//
-//	result = (xc * xc + yc * yc) * ((double*)params)[0] + ((double*)params)[1];
-//	result = ((double)srcPixel) - result * 256;
-//	// JMW 2003/08/25  randomize a little to remove banding added by Kekus Digital 26 Aug 2003
-//	// JMW 2004/07/11 a power of two less randomizing for 16 bit
-//	result = result * ((1 + LUMINANCE_RANDOMIZE * LUMINANCE_RANDOMIZE / 2) -
-//		LUMINANCE_RANDOMIZE * LUMINANCE_RANDOMIZE * rand() / (double)RAND_MAX);
-//	if (result > 65535.0) return 65535;
-//	if (result < 0.0) return 0;
-//
-//	return((unsigned short)(result + 0.5));
-//}
-////Kekus.
 
-// Get smallest positive (non-zero) root of polynomial with degree deg and
-// (n+1) real coefficients p[i]. Return it, or 1000.0 if none exists or error occured
-// Changed to only allow degree 3
-#if 0
-double smallestRoot(double *p)
-{
-	doublecomplex 		root[3], poly[4];
-	doublereal 			radius[3], apoly[4], apolyr[4];
-	logical 			myErr[3];
-	double 				sRoot = 1000.0;
-	doublereal 			theEps, theBig, theSmall;
-	integer 			nitmax;
-	integer 			iter;
-	integer 			n, i;
-
-	n = 3;
-
-
-	for (i = 0; i< n + 1; i++)
-	{
-		poly[i].r = p[i];
-		poly[i].i = 0.0;
-	}
-
-	theEps = DBL_EPSILON;  		// machine precision 
-	theSmall = DBL_MIN; 			// smallest positive real*8          
-	theBig = DBL_MAX; 			// largest real*8  
-
-	nitmax = 100;
-
-	polzeros_(&n, poly, &theEps, &theBig, &theSmall, &nitmax, root, radius, myErr, &iter, apoly, apolyr);
-
-	for (i = 0; i < n; i++)
-	{
-		//		PrintError("No %d : Real %g, Imag %g, radius %g, myErr %ld", i, root[i].r, root[i].i, radius[i], myErr[i]);
-		if ((root[i].r > 0.0) && (dabs(root[i].i) <= radius[i]) && (root[i].r < sRoot))
-			sRoot = root[i].r;
-	}
-
-	return sRoot;
-}
-#endif
-
-
-
-void cubeZero(double *a, int *n, double *root) {
+void CubeZero(double *a, int *n, double *root) {
 	if (a[3] == 0.0){ // second order polynomial
-		squareZero(a, n, root);
+		SquareZero(a, n, root);
 	}
 	else{
 		double p = ((-1.0 / 3.0) * (a[2] / a[3]) * (a[2] / a[3]) + a[1] / a[3]) / 3.0;
@@ -1858,7 +1481,7 @@ void cubeZero(double *a, int *n, double *root) {
 
 		if (q*q + p*p*p >= 0.0){
 			*n = 1;
-			root[0] = cubeRoot(-q + sqrt(q*q + p*p*p)) + cubeRoot(-q - sqrt(q*q + p*p*p)) - a[2] / (3.0 * a[3]);
+			root[0] = CubeRoot(-q + sqrt(q*q + p*p*p)) + CubeRoot(-q - sqrt(q*q + p*p*p)) - a[2] / (3.0 * a[3]);
 		}
 		else{
 			double phi = acos(-q / sqrt(-p*p*p));
@@ -1871,7 +1494,7 @@ void cubeZero(double *a, int *n, double *root) {
 	// PrintError("%lg, %lg, %lg, %lg root = %lg", a[3], a[2], a[1], a[0], root[0]);
 }
 
-void squareZero(double *a, int *n, double *root){
+void SquareZero(double *a, int *n, double *root){
 	if (a[2] == 0.0){ // linear equation
 		if (a[1] == 0.0){ // constant
 			if (a[0] == 0.0){
@@ -1898,7 +1521,7 @@ void squareZero(double *a, int *n, double *root){
 
 }
 
-double cubeRoot(double x){
+double CubeRoot(double x){
 	if (x == 0.0)
 		return 0.0;
 	else if (x > 0.0)
@@ -1907,11 +1530,11 @@ double cubeRoot(double x){
 		return -pow(-x, 1.0 / 3.0);
 }
 
-double smallestRoot(double *p){
+double SmallestRoot(double *p){
 	int n, i;
 	double root[3], sroot = 1000.0;
 
-	cubeZero(p, &n, root);
+	CubeZero(p, &n, root);
 
 	for (i = 0; i<n; i++){
 		// PrintError("Root %d = %lg", i,root[i]);
@@ -1937,7 +1560,7 @@ void SetCorrectionRadius(double* rad) {
 				a[k] = (k + 1) * rad[k];
 			}
 		}
-		rad[4] = smallestRoot(a);
+		rad[4] = SmallestRoot(a);
 	}
 }
 
