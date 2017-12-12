@@ -8,4 +8,3 @@ public:
 };
 
 #endif // !PANORAMASTITCH_PANOSTITCH_H_
-

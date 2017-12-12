@@ -6,6 +6,6 @@ Different blending algorithms are applied to the videos including feather blendi
 
 This repository only contains CPU version.
 
-# Environment
+### Environment
 
-* VS2015 + OpenCV
+* VS2015 + OpenCV 3.2

@@ -70,4 +70,8 @@ void FeatherBlend::Blend(const std::vector<cv::Mat>& images, cv::Mat& result) {
     result.convertTo(result, CV_8U);
 }
 
+/*
+* MultiBandBlend
+*/
+
 #undef WEIGHT_EPS

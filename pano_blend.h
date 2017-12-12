@@ -29,4 +29,3 @@ private:
 };
 
 #endif // !PANORAMASTITCH_PANOBLEND_H
-
