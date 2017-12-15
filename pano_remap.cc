@@ -4,15 +4,15 @@
 #include <algorithm>
 
 PanoRemap::PanoRemap(std::string script_name) : ps(script_name) {
-    num_stitch = ps.num_images;
+    stitch_num = ps.num_images;
     panorama_roi.width = ps.panorama.w;
     panorama_roi.height = ps.panorama.h;
     // initial transforms
     initial_transforms();
     // initial remap table
-    remap_table_x = new double*[num_stitch];
-    remap_table_y = new double*[num_stitch];
-    for (size_t idx = 0; idx < num_stitch; idx++) {
+    remap_table_x = new double*[stitch_num];
+    remap_table_y = new double*[stitch_num];
+    for (size_t idx = 0; idx < stitch_num; idx++) {
         remap_table_x[idx] = new double[panorama_roi.area()];
         remap_table_y[idx] = new double[panorama_roi.area()];
     }
@@ -20,7 +20,7 @@ PanoRemap::PanoRemap(std::string script_name) : ps(script_name) {
 }
 
 PanoRemap::~PanoRemap() {
-    for (size_t idx = 0; idx < num_stitch; idx++) {
+    for (size_t idx = 0; idx < stitch_num; idx++) {
         delete[] remap_table_x[idx];
         delete[] remap_table_y[idx];
     }
@@ -74,12 +74,12 @@ inline double PanoRemap::Cubic12(double x) {
 	a[0] = Cubic12(x + 1.0);									\
 
 void PanoRemap::Remap(const std::vector<cv::Mat>& frames, std::vector<cv::Mat>& remap_frames) {
-    remap_frames.resize(num_stitch);
-    for (int i = 0; i < num_stitch; i++) {
+    remap_frames.resize(stitch_num);
+    for (int i = 0; i < stitch_num; i++) {
         remap_frames[i] = cv::Mat::zeros(panorama_roi.size(), CV_8UC3);
     }
     int wd = panorama_roi.width, hd = panorama_roi.height;
-    for (int idx = 0; idx < num_stitch; idx++) { // idx : image iterator
+    for (int idx = 0; idx < stitch_num; idx++) { // idx : image iterator
         int ws = frames[idx].cols, hs = frames[idx].rows;
         for (int y = 0; y < hd; y++) {
             for (int x = 0; x < wd; x++) {
@@ -137,15 +137,15 @@ void PanoRemap::initial_remap_table() {
     std::cout << "Set the frame remapping table : ";
     clock_t start = clock();
 
-    masks.resize(num_stitch);
-    for (int i = 0; i < num_stitch; i++) {
+    masks.resize(stitch_num);
+    for (int i = 0; i < stitch_num; i++) {
         masks[i] = cv::Mat::zeros(panorama_roi.size(), CV_8U);
     }
     
     int w = ps.panorama.w, h = ps.panorama.h;
     double w2 = (double)w / 2.0 - 0.5, h2 = (double)h / 2.0 - 0.5;
     double dx, dy;
-    for (int idx = 0; idx < num_stitch; idx++) {
+    for (int idx = 0; idx < stitch_num; idx++) {
         int iw = ps.images[idx].w, ih = ps.images[idx].h;
         double sw2 = (double)ps.images[idx].w / 2.0 - 0.5, sh2 = (double)ps.images[idx].h / 2.0 - 0.5;
         for (int y = 0; y < h; y++) {
@@ -188,8 +188,8 @@ void PanoRemap::initial_remap_table() {
 }
 
 void PanoRemap::initial_transforms() {
-    transforms.resize(num_stitch);
-    for (size_t idx = 0; idx < num_stitch; idx++) {
+    transforms.resize(stitch_num);
+    for (size_t idx = 0; idx < stitch_num; idx++) {
         PanoParam& panorama = ps.panorama;
         ImageParam& image = ps.images[idx]; // ÉèÖÃµ±Ç°Í¼Ïñ
         TransformParam& transform = transforms[idx];

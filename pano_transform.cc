@@ -1563,4 +1563,3 @@ void SetCorrectionRadius(double* rad) {
 		rad[4] = SmallestRoot(a);
 	}
 }
-

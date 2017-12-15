@@ -150,4 +150,4 @@ int shift_scale_rotate(double x_dest, double  y_dest, double* x_src, double* y_s
 
 void SetCorrectionRadius(double* rad);
 
-#endif // #ifndef PANORAMASTITCH_PANOSCRIPT_H_
+#endif // PANORAMASTITCH_PANOSCRIPT_H_

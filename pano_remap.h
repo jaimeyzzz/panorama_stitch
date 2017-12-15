@@ -26,7 +26,7 @@ private:
     static double Cubic01(double x);
     static double Cubic12(double x);
 private:
-    int num_stitch;
+    int stitch_num;
     cv::Rect panorama_roi;
     PanoScript ps;
     std::vector<TransformParam> transforms;
@@ -34,4 +34,4 @@ private:
     double ** remap_table_x, ** remap_table_y;
 };
 
-#endif // !PANORAMASTITCH_PANOREMAP_H_
+#endif // PANORAMASTITCH_PANOREMAP_H_

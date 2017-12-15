@@ -7,4 +7,4 @@ public:
 
 };
 
-#endif // !PANORAMASTITCH_PANOSTITCH_H_
+#endif // PANORAMASTITCH_PANOSTITCH_H_
