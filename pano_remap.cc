@@ -147,7 +147,7 @@ void PanoRemap::initial_remap_table() {
     double dx, dy;
     for (int idx = 0; idx < stitch_num; idx++) {
         int iw = ps.images[idx].w, ih = ps.images[idx].h;
-        double sw2 = (double)ps.images[idx].w / 2.0 - 0.5, sh2 = (double)ps.images[idx].h / 2.0 - 0.5;
+        double sw2 = (double)iw / 2.0 - 0.5, sh2 = (double)ih / 2.0 - 0.5;
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 double y_d = (double)y - h2;
@@ -190,14 +190,10 @@ void PanoRemap::initial_remap_table() {
 void PanoRemap::initial_transforms() {
     transforms.resize(stitch_num);
     for (size_t idx = 0; idx < stitch_num; idx++) {
-        PanoParam& panorama = ps.panorama;
-        ImageParam& image = ps.images[idx]; // 设置当前图像
+        const PanoParam& panorama = ps.panorama;
+        const ImageParam& image = ps.images[idx]; // 设置当前图像
         TransformParam& transform = transforms[idx];
 
-        if (image.crop) { // 如果需要裁剪，根据裁剪区域更新图像的宽度和高度
-            image.w = image.C[1] - image.C[0];
-            image.h = image.C[3] - image.C[2];
-        }
         int image_selection_width = image.w;
         int image_selection_height = image.h;
 

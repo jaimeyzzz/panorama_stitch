@@ -9,7 +9,7 @@ NaiveBlend::NaiveBlend(const std::vector<cv::Mat>& masks) : masks(masks) {
 }
 
 void NaiveBlend::Blend(const std::vector<cv::Mat>& images, cv::Mat& result) {
-    for (size_t iter; iter < images.size(); iter++) {
+    for (int iter = 0; iter < images.size(); iter++) {
         images[iter].copyTo(result, masks[iter]);
     }
 }
@@ -46,26 +46,25 @@ void FeatherBlend::Blend(const std::vector<cv::Mat>& images, cv::Mat& result) {
     result = cv::Mat::zeros(h, w, CV_32FC3);
     for (size_t iter = 0; iter < stitch_num; iter ++) {
         for (int y = 0; y < h; ++y) {
-            const cv::Vec3b* src_row = images[iter].ptr<cv::Vec3b>(y);
+            const cv::Point3_<uchar>* src_row = images[iter].ptr<cv::Point3_<uchar> >(y);
             const float* weight_row = weights[iter].ptr<float>(y);
-            cv::Vec3b* dst_row = result.ptr<cv::Vec3b>(y);
-            float* dstWeightRow = dst_weight.ptr<float>(y);
+            cv::Point3_<float>* dst_row = result.ptr<cv::Point3_<float> >(y);
 
             for (int x = 0; x < w; ++x) {
-                for (int k = 0; k < 3; ++k) {
-                    dst_row[x][k] += (float)src_row[x][k] * weight_row[x];
-                }
+                dst_row[x].x += (float)src_row[x].x * weight_row[x];
+                dst_row[x].y += (float)src_row[x].y * weight_row[x];
+                dst_row[x].z += (float)src_row[x].z * weight_row[x];
             }
         }
     }
     for (int y = 0; y < h; ++y) {
-        const float* dstWeightRow = dst_weight.ptr<float>(y);
-        cv::Vec3b* dst_row = result.ptr<cv::Vec3b>(y);
+        const float* dst_weight_row = dst_weight.ptr<float>(y);
+        cv::Point3_<float>* dst_row = result.ptr<cv::Point3_<float> >(y);
 
         for (int x = 0; x < w; ++x) {
-            for (int k = 0; k < 3; ++k) {
-                dst_row[x][k] /= dstWeightRow[x] + FEATHERBLEND_WEIGHT_EPS;
-            }
+            dst_row[x].x /= dst_weight_row[x] + FEATHERBLEND_WEIGHT_EPS;
+            dst_row[x].y /= dst_weight_row[x] + FEATHERBLEND_WEIGHT_EPS;
+            dst_row[x].z /= dst_weight_row[x] + FEATHERBLEND_WEIGHT_EPS;
         }
     }
     result.convertTo(result, CV_8U);
