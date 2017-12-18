@@ -21,10 +21,10 @@ int main() {
         str << remap_image_dir << iter << ".png";
         images[iter] = cv::imread(str.str(), 1);
         str.str(std::string());
-        str << mask_image_dir << "Pano.Mask." << iter << ".png";
+        str << mask_image_dir << "MBB.Mask." << iter << ".png";
         pano_masks[iter] = cv::imread(str.str(), 0);
     }
-    FeatherBlend nb(pano_masks);
+    MultiBandBlend nb(pano_masks);
 
     cv::Mat result;
     nb.Blend(images, result);
