@@ -40,4 +40,16 @@ private:
     std::vector<cv::Mat> dst_laplace_pyr, dst_weight_pyr;
 };
 
+class MVCBlend : public PanoBlend {
+public:
+    MVCBlend(const std::vector<cv::Mat>& masks) {}
+    void Blend(const std::vector<cv::Mat>& images, cv::Mat& result) {}
+private:
+};
+
+class ConvPyrBlend : public PanoBlend {
+    ConvPyrBlend(const std::vector<cv::Mat>& masks);
+    void Blend(const std::vector<cv::Mat>& images, cv::Mat& result);
+};
+
 #endif // PANORAMASTITCH_PANOBLEND_H
