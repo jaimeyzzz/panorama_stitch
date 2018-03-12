@@ -177,14 +177,3 @@ void MultiBandBlend::Blend(const std::vector<cv::Mat>& images, cv::Mat& result) 
     dst_laplace_pyr[0](cv::Rect(0, 0, dst_mask.cols, dst_mask.rows)).copyTo(result, dst_mask);
     result.convertTo(result, CV_8U);
 }
-
-/*
-* ConvPyrBlend
-*/
-ConvPyrBlend::ConvPyrBlend(const std::vector<cv::Mat>& masks) {
-
-}
-
-void ConvPyrBlend::Blend(const std::vector<cv::Mat>& images, cv::Mat& result) {
-
-}

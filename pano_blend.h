@@ -47,9 +47,4 @@ public:
 private:
 };
 
-class ConvPyrBlend : public PanoBlend {
-    ConvPyrBlend(const std::vector<cv::Mat>& masks);
-    void Blend(const std::vector<cv::Mat>& images, cv::Mat& result);
-};
-
 #endif // PANORAMASTITCH_PANOBLEND_H
