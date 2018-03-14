@@ -1,11 +1,13 @@
-#ifndef MVC_MVCBLEND_H
-#define MVC_MVCBLEND_H
+#ifndef PANORAMASTITCH_MVCBLEND_H
+#define PANORAMASTITCH_MVCBLEND_H
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/cuda.hpp>
 #include <vector>
 
-class MVCBlend {
+#include "pano_blend.h"
+
+class MVCBlend : public PanoBlend{
 public:
     MVCBlend(const std::vector<cv::Mat>& masks, const std::vector<std::vector<cv::Point> >& boundary, const std::vector<std::vector<int> >& boundary_idx, int pano_w, int pano_h);
     ~MVCBlend();
@@ -51,4 +53,4 @@ private:
     double ** h_boundary_diff, ** d_boundary_diff;
 };
 
-#endif // MVC_MVCBLEND_H
+#endif // PANORAMASTITCH_MVCBLEND_H

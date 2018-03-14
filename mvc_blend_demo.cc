@@ -115,7 +115,7 @@ void CalculateBoundary(const vector<Mat>& pano_masks, vector<Mat>& blend_masks, 
     blend_masks.erase(blend_masks.begin());
 }
 
-int main() {
+int mvc_blend_demo() {
     const string example_dir = "example/";
     const string remap_image_dir = example_dir + "remap/";
     const string mask_image_dir = example_dir + "masks/";

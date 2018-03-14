@@ -30,6 +30,15 @@
     <ClCompile Include="pano_blend.cc">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mvc_blend.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mvc_blend_demo.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mbb_blend.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pano_transform.h">
@@ -50,5 +59,15 @@
     <ClInclude Include="pano_blend.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="mvc_blend.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mbb_blend.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="mvc_blend.cu" />
+    <CudaCompile Include="mbb_blend.cu" />
   </ItemGroup>
 </Project>

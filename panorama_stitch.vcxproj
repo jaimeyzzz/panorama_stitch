@@ -32,6 +32,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 8.0.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -80,10 +81,17 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>./libs</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world320.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CudaToolkitLibDir)\cudart.lib;libgmp-10.lib;opencv_world320.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_61,sm_61;%(CodeGeneration)</CodeGeneration>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="mbb_blend.cc" />
+    <ClCompile Include="mvc_blend_demo.cc" />
+    <ClCompile Include="mvc_blend.cc" />
     <ClCompile Include="pano_blend.cc" />
     <ClCompile Include="pano_remap.cc" />
     <ClCompile Include="pano_script.cc" />
@@ -91,6 +99,8 @@
     <ClCompile Include="stitch_demo.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mbb_blend.h" />
+    <ClInclude Include="mvc_blend.h" />
     <ClInclude Include="pano_blend.h" />
     <ClInclude Include="pano_common.h" />
     <ClInclude Include="pano_remap.h" />
@@ -98,7 +108,14 @@
     <ClInclude Include="pano_stitch.h" />
     <ClInclude Include="pano_transform.h" />
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="mbb_blend.cu" />
+    <CudaCompile Include="mvc_blend.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 8.0.targets" />
   </ImportGroup>
 </Project>

@@ -4,6 +4,8 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
+#define BLEND_WEIGHT_EPS 1e-5
+
 class PanoBlend {
 public:
     virtual void Blend(const std::vector<cv::Mat>& images, cv::Mat& result) = 0;
@@ -26,25 +28,6 @@ private:
     cv::Rect dst_roi;
     cv::Mat dst_weight;
     std::vector<cv::Mat> masks, weights;
-};
-
-class MultiBandBlend : public PanoBlend {
-public:
-    MultiBandBlend(const std::vector<cv::Mat>& masks);
-    void Blend(const std::vector<cv::Mat>& images, cv::Mat& result);
-private:
-    int stitch_num, band_num;
-    cv::Rect dst_roi;
-    cv::Mat dst_mask;
-    std::vector<std::vector<cv::Mat> > src_laplace_pyr, src_weight_pyr;
-    std::vector<cv::Mat> dst_laplace_pyr, dst_weight_pyr;
-};
-
-class MVCBlend : public PanoBlend {
-public:
-    MVCBlend(const std::vector<cv::Mat>& masks) {}
-    void Blend(const std::vector<cv::Mat>& images, cv::Mat& result) {}
-private:
 };
 
 #endif // PANORAMASTITCH_PANOBLEND_H
